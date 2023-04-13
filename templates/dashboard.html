@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Welcome to your dashboard, {{ user.username }}!</h1>
+
+    <h2>Create a new tweet</h2>
+    <form method="POST" action="{{ url_for('create_tweet') }}">
+        <textarea name="content" placeholder="What's on your mind?" required></textarea>
+        <input type="hidden" name="user_id" value="{{ user.id }}">
+        <button type="submit">Tweet</button>
+    </form>
+
+    <h2>Recent Tweets</h2>
+    {% if tweets %}
+        {% for tweet in tweets %}
+            <div class="tweet">
+                <p>{{ tweet.content }}</p>
+                <p><small>Posted by {{ tweet.user.username }} on {{ tweet.timestamp }}</small></p>
+                <form method="POST" action="{{ url_for('create_thread') }}">
+                    <textarea name="content" placeholder="Reply to this tweet" required></textarea>
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <input type="hidden" name="tweet_id" value="{{ tweet.id }}">
+                    <button type="submit">Reply</button>
+                </form>
+                {% for thread in tweet.threads %}
+                    <ul>
+                        <li>
+                            <p>{{ thread.content }}</p>
+                            <p><small>Posted by {{ thread.user.username }} on {{ thread.timestamp }}</small></p>
+                        </li>
+                    </ul>
+                {% endfor %}
+            </div>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <p>No tweets yet.</p>
+    {% endif %}
+{% endblock %}
+
