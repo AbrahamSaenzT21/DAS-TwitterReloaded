@@ -36,5 +36,17 @@
     {% else %}
         <p>No tweets yet.</p>
     {% endif %}
+    <h2>Most Commented Tweet of the Day</h2>
+    {% if most_commented_tweet %}
+        <p>{{ most_commented_tweet.content }}</p>
+    {% else %}
+        <p>No tweets found.</p>
+    {% endif %}
+    <h2>User with Most Threads Today</h2>
+    {% if most_threads_user %}
+        <p>{{ most_threads_user.username }}</p>
+    {% else %}
+        <p>No threads created today</p>
+    {% endif %}
 {% endblock %}
 

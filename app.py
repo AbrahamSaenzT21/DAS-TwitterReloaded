@@ -4,6 +4,8 @@ from controllers import TweetController, ThreadController, UserController, Event
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///twitter.db'
+app.config['SERVER_NAME'] = 'localhost:5000'
+
 db.init_app(app)
 
 tweet_controller = TweetController()
@@ -36,8 +38,10 @@ def dashboard(username):
     user = user_controller.get_user_by_username(username)
     if not user:
         return 'User not found'
+    most_commented_tweet = tweet_controller.get_most_commented_tweet_of_day()
+    most_threads_user = thread_controller.get_user_with_most_threads_in_day()
     tweets = tweet_controller.get_latest_tweets(10)
-    return render_template('dashboard.html', user=user, tweets=tweets)
+    return render_template('dashboard.html', user=user, tweets=tweets, most_commented_tweet=most_commented_tweet, most_threads_user=most_threads_user)
 
 
 @app.route('/tweet', methods=['POST'])

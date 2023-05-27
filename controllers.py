@@ -1,5 +1,5 @@
 from models import Tweet, Thread, User, Event, db
-
+from datetime import datetime, date
 
 class TweetController:
     def create_tweet(self, content, user_id):
@@ -10,6 +10,12 @@ class TweetController:
 
     def get_latest_tweets(self, limit):
         return Tweet.query.order_by(Tweet.timestamp.desc()).limit(limit)
+
+    def get_most_commented_tweet_of_day(self):
+        today = date.today()
+        most_commented_tweet = db.session.query(Tweet).join(Thread).filter(Thread.timestamp >= today).group_by(
+            Tweet.id).order_by(db.func.count(Thread.id).desc()).first()
+        return most_commented_tweet
 
 
 class ThreadController:
@@ -38,6 +44,26 @@ class ThreadController:
             return None
 
         return Tweet.query.filter_by(id=most_commented_tweet_id[0]).first()
+
+    def get_user_with_most_threads_in_day(self):
+        today = date.today()
+        threads = Thread.query.filter(db.func.date(Thread.timestamp) == today).all()
+
+        user_counts = {}
+        for thread in threads:
+            user_id = thread.user_id
+            if user_id in user_counts:
+                user_counts[user_id] += 1
+            else:
+                user_counts[user_id] = 1
+
+        if not user_counts:
+            return None
+
+        user_id_with_most_threads = max(user_counts, key=user_counts.get)
+        user = User.query.get(user_id_with_most_threads)
+
+        return user
 
 
 class UserController:
